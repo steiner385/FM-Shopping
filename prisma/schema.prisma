@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum definitions matching TypeScript enums
+enum ShoppingListStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum ShoppingItemStatus {
+  PENDING
+  PURCHASED
+  OUT_OF_STOCK
+  CANCELLED
+}
+
+// User model (referenced by shopping lists, items, categories)
+model User {
+  id            String    @id @default(cuid())
+  familyId      String
+  name          String
+  shoppingLists ShoppingList[]
+  shoppingItems ShoppingItem[]
+  shoppingCategories ShoppingCategory[]
+}
+
+// Family model to group shopping lists
+model Family {
+  id            String    @id @default(cuid())
+  name          String
+  shoppingLists ShoppingList[]
+  shoppingCategories ShoppingCategory[]
+}
+
+// Shopping List model with comprehensive details
+model ShoppingList {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  status        ShoppingListStatus @default(DRAFT)
+  
+  // Relationships
+  userId        String
+  familyId      String
+  user          User     @relation(fields: [userId], references: [id])
+  family        Family   @relation(fields: [familyId], references: [id])
+  
+  // Optional details
+  totalEstimatedCost Decimal?
+  dueDate       DateTime?
+  
+  // Related models
+  items         ShoppingItem[]
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Indexes for performance
+  @@index([userId])
+  @@index([familyId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Shopping Item model
+model ShoppingItem {
+  id            String    @id @default(cuid())
+  listId        String
+  name          String
+  quantity      Decimal
+  unit          String?
+  status        ShoppingItemStatus @default(PENDING)
+  
+  // Optional details
+  estimatedPrice Decimal?
+  priority      Int?
+  category      String?
+  notes         String?
+  
+  // Relationships
+  list          ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Indexes for performance
+  @@index([listId])
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+}
+
+// Shopping Category model
+model ShoppingCategory {
+  id            String    @id @default(cuid())
+  name          String
+  userId        String
+  familyId      String
+  
+  // Optional details
+  color         String?
+  icon          String?
+  
+  // Relationships
+  user          User     @relation(fields: [userId], references: [id])
+  family        Family   @relation(fields: [familyId], references: [id])
+  
+  // Indexes for performance
+  @@index([userId])
+  @@index([familyId])
+  @@unique([name, familyId])
+}

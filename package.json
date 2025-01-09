@@ -1,0 +1,31 @@
+{
+  "name": "@familymanager/shopping-plugin",
+  "version": "1.0.0",
+  "description": "Shopping list management plugin for FamilyManager",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["family", "shopping", "plugin", "familymanager"],
+  "author": "FamilyManager",
+  "license": "MIT",
+  "dependencies": {
+    "@familymanager/sdk": "^1.0.0",
+    "zod": "^3.22.4",
+    "hono": "^3.7.2",
+    "@prisma/client": "^5.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "prisma": "^5.6.0"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  }
+}

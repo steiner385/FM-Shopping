@@ -1,0 +1,43 @@
+// Shopping Plugin Schema
+// Note: This extends the core schema by adding shopping-specific models
+
+model ShoppingList {
+  id          String            @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  familyId    String
+  family      Family            @relation(fields: [familyId], references: [id])
+  items       ShoppingListItem[]
+
+  @@index([familyId])
+}
+
+model ShoppingItem {
+  id          String            @id @default(uuid())
+  name        String
+  quantity    Int               @default(1)
+  purchased   Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  familyId    String
+  userId      String
+  family      Family            @relation(fields: [familyId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
+  lists       ShoppingListItem[]
+
+  @@index([familyId])
+  @@index([userId])
+}
+
+model ShoppingListItem {
+  id        String       @id @default(uuid())
+  listId    String
+  itemId    String
+  list      ShoppingList @relation(fields: [listId], references: [id])
+  item      ShoppingItem @relation(fields: [itemId], references: [id])
+
+  @@index([listId])
+  @@index([itemId])
+}
